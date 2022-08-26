@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ChangeType {
+  sunset
+  sunrise
+}
+
+
+model SunChange {
+  id         Int         @id @default(autoincrement())
+  changeType ChangeType
+  changeTime DateTime    
+  angle      Int
+  createdAt   DateTime  @default(now())
+  CloudZone  CloudZone[]
+  Prediction Prediction[]
+}
+
+model CloudZone {
+  id          Int       @id @default(autoincrement())
+  sunChange   SunChange @relation(fields: [sunChangeId], references: [id])
+  sunChangeId Int
+  type        String
+  geometry    Json
+  createdAt   DateTime  @default(now())
+  CloudData   CloudData[]
+}
+
+model CloudData {
+  id Int @id @default(autoincrement())
+  cloudZone CloudZone @relation(fields:[cloudZoneId],references:[id])
+  cloudZoneId Int
+  createdAt   DateTime  @default(now())
+  visibility  Decimal?
+  cloudBase   Decimal?
+  cloudCeiling  Decimal?
+  cloudCover  Decimal?
+}
+
+model Prediction {
+  id Int @id @default(autoincrement())
+  sunChange   SunChange @relation(fields: [sunChangeId], references: [id])
+  sunChangeId Int
+  createdAt   DateTime  @default(now())
+  value       String
+  reason      String
+  predictionMethod String
+}

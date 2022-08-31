@@ -1,5 +1,4 @@
 import { getNextChange } from "../controllers/SunChangeController";
-import { addNextDaySunChanges } from "../actions/addNextDaySunChanges";
 
 export default function Home({ sunchange }) {
   if (sunchange === null) {
@@ -21,8 +20,6 @@ export default function Home({ sunchange }) {
 }
 
 export const getServerSideProps = async () => {
-  console.log("SSR called");
-  await addNextDaySunChanges();
   const sunchange = await getNextChange();
   return {
     props: {

@@ -6,13 +6,11 @@ import CONSTANTS from "../constants";
 import SunCalc from "suncalc";
 
 const addNextDaySunChanges = async () => {
-  console.log("addnextday called");
   // logic to add more sun changes
   const timeNow = new Date();
   const lastSunchange = await getLastChange();
 
-  if (timeNow < lastSunchange.changeTime) {
-    console.log("break");
+  if (timeNow < lastSunchange?.changeTime) {
     return;
   }
 

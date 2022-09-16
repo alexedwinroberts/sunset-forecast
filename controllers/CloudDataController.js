@@ -14,7 +14,7 @@ const addCloudData = async ({
   return entry;
 };
 
-const getLatestCloudDataByCloudZone = async ({ cloudZoneId }) => {
+const getLatestCloudDataByCloudZone = async (cloudZoneId) => {
   const cloudData = await prisma.cloudData.findFirst({
     where: { cloudZoneId: cloudZoneId },
     take: -1,

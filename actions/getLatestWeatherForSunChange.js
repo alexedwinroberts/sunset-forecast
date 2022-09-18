@@ -23,8 +23,8 @@ const getLatestWeatherForSunChange = async () => {
 
   // prepare bodies for API request
   for (const cloudZone of cloudZones) {
-    // add polygon for each cloudzone
-    const geom = JSON.parse(cloudZone.geometry);
+    // Tomorrow.io needs lat lon to be flipped
+    const geom = cloudZone.geometry;
     const poly = [];
     for (const obj of geom) {
       poly.push([obj["lon"], obj["lat"]]);
@@ -75,11 +75,11 @@ const getLatestWeatherForSunChange = async () => {
       )[0];
 
       cloudZone.dbPayload = {
-        cloudZoneId: cloudZone.id,
-        visibility: cloudZone.cloudData.values.visibilityAvg,
-        cloudBase: cloudZone.cloudData.values.cloudBaseAvg,
-        cloudCeiling: cloudZone.cloudData.values.cloudCeilingAvg,
-        cloudCover: cloudZone.cloudData.values.cloudCoverAvg,
+        cloudZoneId: cloudZone?.id,
+        visibility: cloudZone?.cloudData?.values?.visibilityAvg,
+        cloudBase: cloudZone?.cloudData?.values?.cloudBaseAvg,
+        cloudCeiling: cloudZone?.cloudData?.values?.cloudCeilingAvg,
+        cloudCover: cloudZone?.cloudData?.values?.cloudCoverAvg,
       };
     }
 

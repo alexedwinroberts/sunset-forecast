@@ -39,6 +39,11 @@ const addPredictionForNextSunChange = async () => {
 
   const homeZone = cloudZones.filter((zone) => zone.type === "home zone")[0];
   const windowZones = cloudZones.filter((zone) => zone.type !== "home zone");
+  let sumWindowCloudCoverage = 0;
+  for (const zone of windowZones) {
+    sumWindowCloudCoverage += parseInt(zone.cloudData.cloudCover);
+  }
+  const avgWindowCloudCoverage = sumWindowCloudCoverage / windowZones.length;
   const direction = nextChange.changeType === "sunset" ? "west" : "east";
 
   // low visibility in home zone - bad
@@ -46,21 +51,15 @@ const addPredictionForNextSunChange = async () => {
     predictionPayload.value = "poor";
     predictionPayload.reason = "there will be low visibility in Vancouver";
   } // high cloud coverage in window - bad
-  else if (windowZones[0].cloudData.cloudCover > 50) {
+  else if (avgWindowCloudCoverage > 50) {
     predictionPayload.value = "poor";
     predictionPayload.reason = `there will be a lot of cloud coverage in the ${direction} blocking sunlight`;
   } // high altitude above homezone and low coverage in window - great
-  else if (
-    windowZones[0].cloudData.cloudCover < 30 &&
-    homeZone.cloudData.cloudBase > 4
-  ) {
+  else if (avgWindowCloudCoverage < 30 && homeZone.cloudData.cloudBase > 4) {
     predictionPayload.value = "great";
     predictionPayload.reason = `there will be high altitude clouds above Vancouver and few clouds in the ${direction} that could block sunlight`;
   } // low coverage in window and home - nice
-  else if (
-    homeZone.cloudData.cloudCover < 30 &&
-    windowZones[0].cloudData.cloudCover < 30
-  ) {
+  else if (homeZone.cloudData.cloudCover < 30 && avgWindowCloudCoverage < 30) {
     predictionPayload.value = "nice";
     predictionPayload.reason = "there will be low cloud coverage";
   }

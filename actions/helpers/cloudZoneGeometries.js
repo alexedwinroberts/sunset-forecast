@@ -19,7 +19,7 @@ const homeZoneGeometry = () => {
 
 const windowZoneGeometries = (sunAngle) => {
   const origin = VANCOUVER_POSITION;
-  const gridRows = 2;
+  const gridRows = 12;
   const gridLength = 19;
   const windowOffset = 20;
   const windowBuffer = (windowOffset - gridLength) / 2;

@@ -2,7 +2,7 @@ import {
   addSunChange,
   getLastChange,
 } from "../controllers/SunChangeController";
-import CONSTANTS from "../constants";
+import { VANCOUVER_POSITION } from "../constants";
 import SunCalc from "suncalc";
 
 const addNextDaySunChanges = async () => {
@@ -17,8 +17,8 @@ const addNextDaySunChanges = async () => {
   // get times and angles
   const times = SunCalc.getTimes(
     timeNow,
-    CONSTANTS.VANCOUVER_POSITION.lat,
-    CONSTANTS.VANCOUVER_POSITION.lon
+    VANCOUVER_POSITION.lat,
+    VANCOUVER_POSITION.lon
   );
   const sunrise = {
     changeType: "sunrise",
@@ -38,16 +38,16 @@ const addNextDaySunChanges = async () => {
   sunrise["angle"] = getAzimuthInDegrees(
     SunCalc.getPosition(
       times.sunrise,
-      CONSTANTS.VANCOUVER_POSITION.lat,
-      CONSTANTS.VANCOUVER_POSITION.lon
+      VANCOUVER_POSITION.lat,
+      VANCOUVER_POSITION.lon
     ).azimuth
   );
 
   sunset["angle"] = getAzimuthInDegrees(
     SunCalc.getPosition(
       times.sunset,
-      CONSTANTS.VANCOUVER_POSITION.lat,
-      CONSTANTS.VANCOUVER_POSITION.lon
+      VANCOUVER_POSITION.lat,
+      VANCOUVER_POSITION.lon
     ).azimuth
   );
 

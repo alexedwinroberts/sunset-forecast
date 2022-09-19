@@ -1,8 +1,7 @@
-import { getNextChange } from "../controllers/SunChangeController";
-import { getLatestPredictionBySunChange } from "../controllers/PredictionController";
+import { getForecastForNextSunChange } from "../actions/getForecastForNextSunChange";
 
-export default function Home({ sunchange, prediction }) {
-  if (sunchange === null || prediction === null) {
+export default function Home({ forecast }) {
+  if (forecast.sunChange === null || forecast.prediction === null) {
     return (
       <>
         <p>no more sunsets sorry</p>
@@ -14,23 +13,22 @@ export default function Home({ sunchange, prediction }) {
     <>
       <h1>this is the home page</h1>
       <p>
-        next {sunchange.changeType} is at {sunchange.changeTime}
+        next {forecast.sunChange.changeType} is at{" "}
+        {forecast.sunChange.changeTime}
       </p>
       <p>
-        This {sunchange.changeType} will be {prediction.value} because{" "}
-        {prediction.reason}.
+        This {forecast.sunChange.changeType} will be {forecast.prediction.value}{" "}
+        because {forecast.prediction.reason}.
       </p>
     </>
   );
 }
 
 export const getServerSideProps = async () => {
-  const sunchange = await getNextChange();
-  const prediction = await getLatestPredictionBySunChange(sunchange.id);
+  const forecast = await getForecastForNextSunChange();
   return {
     props: {
-      sunchange: JSON.parse(JSON.stringify(sunchange)),
-      prediction: JSON.parse(JSON.stringify(prediction)),
+      forecast: JSON.parse(JSON.stringify(forecast)),
     },
   };
 };

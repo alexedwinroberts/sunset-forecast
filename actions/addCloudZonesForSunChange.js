@@ -22,7 +22,7 @@ const addCloudZonesForSunChange = async () => {
   }
 
   // cloudzone geometries
-  const homeZoneGeom = homeZoneGeometry(0);
+  const homeZoneGeom = homeZoneGeometry();
   const windowZoneGeoms = windowZoneGeometries(nextChange.angle);
 
   const dbPayloads = [];

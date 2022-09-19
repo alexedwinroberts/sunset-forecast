@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import { getForecastForNextSunChange } from "../actions/getForecastForNextSunChange";
 
 export default function Home({ forecast }) {
@@ -8,6 +9,14 @@ export default function Home({ forecast }) {
       </>
     );
   }
+
+  const MapWithNoSSR = dynamic(() => import("../components/map"), {
+    ssr: false,
+  });
+
+  const tempStyle = {
+    height: "600px",
+  };
 
   return (
     <>
@@ -20,6 +29,13 @@ export default function Home({ forecast }) {
         This {forecast.sunChange.changeType} will be {forecast.prediction.value}{" "}
         because {forecast.prediction.reason}.
       </p>
+      <div id="map" style={tempStyle}>
+        <MapWithNoSSR
+          homeZone={forecast.homeZone}
+          windowZones={forecast.windowZones}
+          sunLine={forecast.sunLine}
+        />
+      </div>
     </>
   );
 }

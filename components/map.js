@@ -68,7 +68,7 @@ const Map = ({ homeZone = [], windowZones = [], sunLine = [] }) => {
               </p>
             )}
             {activeZone.data.visibility && (
-              <p>Visibility -{parseInt(activeZone.data.visibility)}km</p>
+              <p>Visibility - {parseInt(activeZone.data.visibility)}km</p>
             )}
           </div>
         </Popup>

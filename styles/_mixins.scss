@@ -1,0 +1,25 @@
+@use "./variables" as *;
+
+@mixin section-max-width-container {
+  max-width: $max-width;
+  margin: 0 auto;
+}
+
+// Media Queries:
+@mixin phone-large {
+  @media (min-width: $phone-large-width) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $tablet-width) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $desktop-width) {
+    @content;
+  }
+}

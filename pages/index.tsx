@@ -1,5 +1,7 @@
 import dynamic from "next/dynamic";
 import { getForecastForNextSunChange } from "../actions/getForecastForNextSunChange";
+import { Layout } from "../components/Layout";
+import styles from "../styles/Forecast.module.scss";
 
 export default function Home({ forecast }) {
   if (forecast.sunChange === null || forecast.prediction === null) {
@@ -14,29 +16,36 @@ export default function Home({ forecast }) {
     ssr: false,
   });
 
-  const tempStyle = {
-    height: "600px",
+  const timeOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    timeZone: "America/Vancouver",
+    timeZoneName: "short",
   };
+  const utcDate = new Date(forecast.sunChange.changeTime);
+  const displayDate = new Intl.DateTimeFormat("en-CA", timeOptions).format(
+    utcDate
+  );
 
   return (
-    <>
-      <h1>this is the home page</h1>
-      <p>
-        next {forecast.sunChange.changeType} is at{" "}
-        {forecast.sunChange.changeTime}
-      </p>
-      <p>
-        This {forecast.sunChange.changeType} will be {forecast.prediction.value}{" "}
-        because {forecast.prediction.reason}.
-      </p>
-      <div id="map" style={tempStyle}>
-        <MapWithNoSSR
-          homeZone={forecast.homeZone}
-          windowZones={forecast.windowZones}
-          sunLine={forecast.sunLine}
-        />
+    <Layout title="YVR sunset forecasts">
+      <div className={styles.forecast__container}>
+        <h1>
+          The next {forecast.sunChange.changeType} will be at {displayDate}
+        </h1>
+        <p>
+          This {forecast.sunChange.changeType} will be{" "}
+          {forecast.prediction.value} because {forecast.prediction.reason}.
+        </p>
+        <div id="map" className={styles.forecast__map}>
+          <MapWithNoSSR
+            homeZone={forecast.homeZone}
+            windowZones={forecast.windowZones}
+            sunLine={forecast.sunLine}
+          />
+        </div>
       </div>
-    </>
+    </Layout>
   );
 }
 

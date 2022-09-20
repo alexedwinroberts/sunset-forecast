@@ -1,0 +1,46 @@
+@use "../styles/mixins" as *;
+
+.header {
+  background-color: #0082f3;
+
+  &__container {
+    @include section-max-width-container;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__link {
+    text-decoration: none;
+    margin-left: 0.5rem;
+  }
+
+  &__text {
+    color: white;
+    text-decoration: none;
+    margin-left: 0.5rem;
+    &:hover {
+      color: #bebebe;
+    }
+  }
+
+  &__iconcontainer {
+    width: 40px;
+    height: 40px;
+  }
+
+  &__icon {
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+}

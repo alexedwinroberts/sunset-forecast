@@ -22,12 +22,6 @@ const addPredictionForNextSunChange = async () => {
   for (const cloudZone of cloudZones) {
     cloudZone.cloudData = await getLatestCloudDataByCloudZone(cloudZone.id);
   }
-  for (const cloudZone of cloudZones) {
-    if (!cloudZone.cloudData) {
-      console.log("missing cloud data");
-      return;
-    }
-  }
 
   // make prediction
   const predictionPayload = {
@@ -38,7 +32,19 @@ const addPredictionForNextSunChange = async () => {
   };
 
   const homeZone = cloudZones.filter((zone) => zone.type === "home zone")[0];
-  const windowZones = cloudZones.filter((zone) => zone.type !== "home zone");
+  if (!homeZone.cloudData) {
+    console.log("missing homezone cloud data");
+    return;
+  }
+
+  const windowZones = cloudZones.filter(
+    (zone) => zone.type !== "home zone" && !!zone.cloudData
+  );
+  if (windowZones.length === 0) {
+    console.log("no valid window zone data");
+    return;
+  }
+
   let sumWindowCloudCoverage = 0;
   for (const zone of windowZones) {
     sumWindowCloudCoverage += parseInt(zone.cloudData.cloudCover);

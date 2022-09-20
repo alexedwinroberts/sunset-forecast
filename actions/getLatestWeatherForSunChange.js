@@ -2,6 +2,7 @@ import { getNextChange } from "../controllers/SunChangeController";
 import { addCloudData } from "../controllers/CloudDataController";
 import { getCloudZonesBySunChange } from "../controllers/CloudZoneController";
 import axios from "axios";
+import Bottleneck from "bottleneck";
 
 const getLatestWeatherForSunChange = async () => {
   // get sunchange id
@@ -52,36 +53,48 @@ const getLatestWeatherForSunChange = async () => {
 
   // get weather data
   try {
-    const response = await axios.all(
-      cloudZones.map((cloudZone) =>
-        axios.post(
-          `https://api.tomorrow.io/v4/timelines?apikey=${process.env.WEATHER_API_KEY}`,
-          cloudZone.requestBody
-        )
-      )
-    );
+    const limiter = new Bottleneck({
+      minTime: 340, //minimum time between requests
+      maxConcurrent: 1, //maximum concurrent requests
+    });
 
-    for (let i = 0; i < response.length; i++) {
-      cloudZones[i].cloudDataIntervals = [
-        ...response[i].data.data.timelines[0].intervals,
-      ];
+    function scheduleRequest(endpoint, payload, zoneId) {
+      return limiter.schedule(() => {
+        return axios.post(endpoint, payload).then((resp) => {
+          return {
+            zoneId,
+            response: resp.data,
+          };
+        });
+      });
     }
 
-    for (const cloudZone of cloudZones) {
-      cloudZone.cloudData = cloudZone.cloudDataIntervals.filter(
+    const cloudPromises = cloudZones.map((cloudZone) => {
+      let endpoint = `https://api.tomorrow.io/v4/timelines?apikey=${process.env.WEATHER_API_KEY}`;
+      return scheduleRequest(endpoint, cloudZone.requestBody, cloudZone.id);
+    });
+
+    const errors = [];
+    const cloudResp = await promiseAll(cloudPromises, errors);
+
+    for (const resp of cloudResp) {
+      const index = cloudZones.findIndex((zone) => zone.id === resp.zoneId);
+      const intervals = resp?.response?.data?.timelines[0].intervals;
+      const cloudData = intervals.filter(
         (interval) =>
           Math.abs(nextChange.changeTime - new Date(interval.startTime)) <=
           1800000
       )[0];
-
-      cloudZone.dbPayload = {
-        cloudZoneId: cloudZone?.id,
-        visibility: cloudZone?.cloudData?.values?.visibilityAvg,
-        cloudBase: cloudZone?.cloudData?.values?.cloudBaseAvg,
-        cloudCeiling: cloudZone?.cloudData?.values?.cloudCeilingAvg,
-        cloudCover: cloudZone?.cloudData?.values?.cloudCoverAvg,
+      cloudZones[index].dbPayload = {
+        cloudZoneId: cloudZones[index]?.id,
+        visibility: cloudData?.values?.visibilityAvg,
+        cloudBase: cloudData?.values?.cloudBaseAvg,
+        cloudCeiling: cloudData?.values?.cloudCeilingAvg,
+        cloudCover: cloudData?.values?.cloudCoverAvg,
       };
     }
+
+    console.log(errors);
 
     await Promise.all(
       cloudZones.map((cloudZone) => {
@@ -92,5 +105,17 @@ const getLatestWeatherForSunChange = async () => {
     console.log(error);
   }
 };
+
+function promiseAll(promises, errors) {
+  return Promise.all(
+    promises.map((p) => {
+      return p.catch((e) => {
+        errors.push(e.response);
+
+        return null;
+      });
+    })
+  );
+}
 
 export { getLatestWeatherForSunChange };

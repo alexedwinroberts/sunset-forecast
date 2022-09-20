@@ -10,6 +10,7 @@
   "dependencies": {
     "@prisma/client": "^4.2.1",
     "axios": "^0.27.2",
+    "bottleneck": "^2.19.5",
     "leaflet": "^1.8.0",
     "next": "latest",
     "react": "^18.1.0",

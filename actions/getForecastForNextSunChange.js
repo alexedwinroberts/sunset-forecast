@@ -29,10 +29,10 @@ const getForecastForNextSunChange = async () => {
     windowZonesRes.push({
       geometry: zone.geometry,
       data: {
-        visibility: zone.data.visibility,
-        cloudBase: zone.data.cloudBase,
-        cloudCeiling: zone.data.cloudCeiling,
-        cloudCover: zone.data.cloudCover,
+        visibility: zone?.data?.visibility,
+        cloudBase: zone?.data?.cloudBase,
+        cloudCeiling: zone?.data?.cloudCeiling,
+        cloudCover: zone?.data?.cloudCover,
       },
     });
   }

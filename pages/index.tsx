@@ -4,11 +4,13 @@ import { Layout } from "../components/Layout";
 import styles from "../styles/Forecast.module.scss";
 
 export default function Home({ forecast }) {
-  if (forecast.sunChange === null || forecast.prediction === null) {
+  if (!forecast?.sunChange) {
     return (
-      <>
-        <p>no more sunsets sorry</p>
-      </>
+      <Layout title="YVR sunset forecasts">
+        <div className={styles.forecast__container}>
+          <h1>Please check again later</h1>
+        </div>
+      </Layout>
     );
   }
 
@@ -33,10 +35,18 @@ export default function Home({ forecast }) {
         <h1>
           The next {forecast.sunChange.changeType} will be at {displayDate}
         </h1>
-        <p>
-          This {forecast.sunChange.changeType} will be{" "}
-          {forecast.prediction.value} because {forecast.prediction.reason}.
-        </p>
+        {forecast?.prediction ? (
+          <p>
+            This {forecast.sunChange.changeType} will be{" "}
+            {forecast.prediction.value} because {forecast.prediction.reason}.
+          </p>
+        ) : (
+          <p>
+            We don't have a prediction right now, please check again in a few
+            hours
+          </p>
+        )}
+
         <div id="map" className={styles.forecast__map}>
           <MapWithNoSSR
             homeZone={forecast.homeZone}
@@ -51,9 +61,10 @@ export default function Home({ forecast }) {
 
 export const getServerSideProps = async () => {
   const forecast = await getForecastForNextSunChange();
+
   return {
     props: {
-      forecast: JSON.parse(JSON.stringify(forecast)),
+      ...(forecast && { forecast: JSON.parse(JSON.stringify(forecast)) }),
     },
   };
 };

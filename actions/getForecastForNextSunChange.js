@@ -11,15 +11,12 @@ const getForecastForNextSunChange = async () => {
     console.log("no sunchange");
     return;
   }
+
   const prediction = await getLatestPredictionBySunChange(nextChange?.id);
-  if (!prediction) {
-    console.log("no no prediction data");
-    return;
-  }
 
   const cloudZones = await getCloudZonesBySunChange(nextChange.id);
   const homeZone = cloudZones.filter((zone) => zone.type === "home zone")[0];
-  const homeZoneData = await getLatestCloudDataByCloudZone(homeZone.id);
+  const homeZoneData = await getLatestCloudDataByCloudZone(homeZone?.id);
   const windowZones = cloudZones.filter((zone) => zone.type !== "home zone");
   for (const zone of windowZones) {
     zone.data = await getLatestCloudDataByCloudZone(zone.id);
@@ -51,20 +48,24 @@ const getForecastForNextSunChange = async () => {
       changeType: nextChange.changeType,
       changeTime: nextChange.changeTime,
     },
-    prediction: {
-      value: prediction.value,
-      reason: prediction.reason,
-    },
-    homeZone: {
-      geometry: homeZone?.geometry,
-      data: {
-        visibility: homeZoneData?.visibility,
-        cloudBase: homeZoneData?.cloudBase,
-        cloudCeiling: homeZoneData?.cloudCeiling,
-        cloudCover: homeZoneData?.cloudCover,
+    ...(prediction && {
+      prediction: {
+        value: prediction.value,
+        reason: prediction.reason,
       },
-    },
-    windowZones: windowZonesRes,
+    }),
+    ...(homeZone && {
+      homeZone: {
+        geometry: homeZone?.geometry,
+        data: {
+          visibility: homeZoneData?.visibility,
+          cloudBase: homeZoneData?.cloudBase,
+          cloudCeiling: homeZoneData?.cloudCeiling,
+          cloudCover: homeZoneData?.cloudCover,
+        },
+      },
+    }),
+    ...(windowZones && { windowZones: windowZonesRes }),
     sunLine: sunLinePoints,
   };
 };

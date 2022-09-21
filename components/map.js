@@ -28,7 +28,7 @@ const Map = ({ homeZone = [], windowZones = [], sunLine = [] }) => {
       />
       {windowZones.map((zone) => (
         <Polygon
-          key={zone.geometry[0].lat}
+          key={zone?.geometry[0].lat}
           positions={zone.geometry}
           pathOptions={windowOptions}
           eventHandlers={{
@@ -38,14 +38,16 @@ const Map = ({ homeZone = [], windowZones = [], sunLine = [] }) => {
           }}
         />
       ))}
-      <Polygon
-        positions={homeZone.geometry}
-        eventHandlers={{
-          click: (e) => {
-            setActiveZone(homeZone);
-          },
-        }}
-      ></Polygon>
+      {homeZone.geometry && (
+        <Polygon
+          positions={homeZone.geometry}
+          eventHandlers={{
+            click: (e) => {
+              setActiveZone(homeZone);
+            },
+          }}
+        ></Polygon>
+      )}
       <Polyline positions={sunLine} pathOptions={lineOptions}></Polyline>
       {activeZone && (
         <Popup

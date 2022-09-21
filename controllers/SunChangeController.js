@@ -16,6 +16,9 @@ const getNextChange = async () => {
         gt: timeNow,
       },
     },
+    orderBy: {
+      changeTime: "asc",
+    },
   });
 
   return sunChange;
@@ -29,4 +32,17 @@ const getLastChange = async () => {
   return sunChange;
 };
 
-export { addSunChange, getNextChange, getLastChange };
+const getChangesInTimeWindow = async (timeStart, timeEnd) => {
+  const sunChanges = await prisma.sunChange.findMany({
+    where: {
+      changeTime: {
+        lt: timeEnd,
+        gt: timeStart,
+      },
+    },
+  });
+
+  return sunChanges;
+};
+
+export { addSunChange, getNextChange, getLastChange, getChangesInTimeWindow };

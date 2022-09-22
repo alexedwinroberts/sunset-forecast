@@ -23,4 +23,12 @@ const getLatestCloudDataByCloudZone = async (cloudZoneId) => {
   return cloudData;
 };
 
-export { addCloudData, getLatestCloudDataByCloudZone };
+const getLatestCloudDataEntry = async () => {
+  const cloudData = await prisma.cloudData.findFirst({
+    take: -1,
+  });
+
+  return cloudData;
+};
+
+export { addCloudData, getLatestCloudDataByCloudZone, getLatestCloudDataEntry };

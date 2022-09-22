@@ -1,8 +1,12 @@
 import { getNextChange } from "../controllers/SunChangeController";
-import { addCloudData } from "../controllers/CloudDataController";
+import {
+  addCloudData,
+  getLatestCloudDataEntry,
+} from "../controllers/CloudDataController";
 import { getCloudZonesBySunChange } from "../controllers/CloudZoneController";
 import axios from "axios";
 import Bottleneck from "bottleneck";
+import { API_RATE_LIMIT_HOURLY } from "../constants";
 
 const getLatestWeatherForSunChange = async () => {
   // get sunchange id
@@ -15,6 +19,15 @@ const getLatestWeatherForSunChange = async () => {
   // get cloud zones
   const cloudZones = await getCloudZonesBySunChange(nextChange.id);
   if (Array.isArray(cloudZones) && cloudZones.length === 0) {
+    return;
+  }
+
+  // check no previous request in last hour (API limit)
+  const lastCloudData = await getLatestCloudDataEntry();
+  const timeNow = new Date();
+  const lastHour = new Date(timeNow.getTime() - API_RATE_LIMIT_HOURLY);
+  if (lastCloudData?.createdAt > lastHour) {
+    console.log("weather request already made in last hour");
     return;
   }
 

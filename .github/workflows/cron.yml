@@ -1,0 +1,12 @@
+name: hourly-refresh
+on:
+  schedule:
+    - cron: "0 */1 * * *"
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call initForecast
+        run: |
+          curl --request GET \
+          --url '//https://sunset-forecast.vercel.app/api/initForecast' \

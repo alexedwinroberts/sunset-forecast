@@ -42,8 +42,8 @@ export default function Home({ forecast }) {
           </p>
         ) : (
           <p>
-            We don't have a prediction right now, please check again in a few
-            hours
+            We don&apos;t have a prediction right now, please check again in a
+            few hours
           </p>
         )}
 
